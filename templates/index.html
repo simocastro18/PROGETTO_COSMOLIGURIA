@@ -345,7 +345,7 @@
         {% if nasa.media_type == "video" %}
           <iframe src="{{ nasa.url }}" allowfullscreen></iframe>
         {% else %}
-          <img src="{{ nasa.url }}" alt="{{ nasa.title }}" loading="lazy"/>
+          <img src="/nasa-image" alt="{{ nasa.title }}" loading="lazy"/>
         {% endif %}
       </div>
 

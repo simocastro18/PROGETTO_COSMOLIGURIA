@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, render_template
+from flask import Flask, render_template, Response
 from datetime import datetime
 
 app = Flask(__name__)
@@ -58,6 +58,21 @@ def index():
 
     now = datetime.now().strftime("%A %d %B %Y, %H:%M")
     return render_template("index.html", nasa=nasa_data, meteo=meteo, now=now)
+
+
+@app.route("/nasa-image")
+def nasa_image():
+    url = requests.utils.requote_uri(
+        requests.get(
+            f"https://api.nasa.gov/planetary/apod?api_key={NASA_API_KEY}",
+            timeout=10
+        ).json().get("url", "")
+    )
+    r = requests.get(url, timeout=15, stream=True)
+    return Response(
+        r.iter_content(chunk_size=8192),
+        content_type=r.headers.get("Content-Type", "image/jpeg")
+    )
 
 
 def wmo_to_desc(code):
