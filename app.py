@@ -62,17 +62,21 @@ def index():
 
 @app.route("/nasa-image")
 def nasa_image():
-    url = requests.utils.requote_uri(
-        requests.get(
+    try:
+        apod = requests.get(
             f"https://api.nasa.gov/planetary/apod?api_key={NASA_API_KEY}",
             timeout=10
-        ).json().get("url", "")
-    )
-    r = requests.get(url, timeout=15, stream=True)
-    return Response(
-        r.iter_content(chunk_size=8192),
-        content_type=r.headers.get("Content-Type", "image/jpeg")
-    )
+        ).json()
+        img_url = apod.get("hdurl") or apod.get("url", "")
+        if not img_url:
+            return "No image URL", 404
+        r = requests.get(img_url, timeout=15, stream=True)
+        return Response(
+            r.iter_content(chunk_size=8192),
+            content_type=r.headers.get("Content-Type", "image/jpeg")
+        )
+    except Exception as e:
+        return str(e), 500
 
 
 def wmo_to_desc(code):
